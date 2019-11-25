@@ -2,8 +2,10 @@ import express from 'express';
 import { create as createHbs } from 'express-handlebars';
 import path from 'path';
 import { AddressInfo } from 'net';
+import { IRepository } from './repository';
+import { DroneLocation } from './types';
 
-export function start(port: number, drones: Map<string,string>) {
+export function start(port: number, drones: IRepository<DroneLocation>) {
     const httpServer = express();
 
     let hbs = createHbs({
@@ -21,7 +23,7 @@ export function start(port: number, drones: Map<string,string>) {
         let items = Array.from([]);
         
         response.render('index', {
-            drones: Array.from(drones.entries())
+            drones: Array.from(drones.getItems())
         });
     });
 

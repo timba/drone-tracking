@@ -4,14 +4,22 @@
             <thead>            
                 <tr>
                     <th>ID</th>
-                    <th>Location</th>
+                    <th>Time reported</th>
+                    <th>Lat</th>
+                    <th>Lon</th>
+                    <th>Alt</th>
+                    <th>Seqnum</th>
                 </tr>
             </thead>
             <tbody>
                 {{#each drones}}
                 <tr>
-                    <td>{{[0]}}</td>
-                    <td>{{[1]}}</td>
+                    <td>{{droneId}}</td>
+                    <td>{{timeReported}}</td>
+                    <td>{{location.latitude}}</td>
+                    <td>{{location.longitude}}</td>
+                    <td>{{location.altitude}}</td>
+                    <td>{{seqnum}}</td>
                 </tr>
                 {{/each}}
             </tbody>
