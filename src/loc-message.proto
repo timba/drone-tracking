@@ -1,0 +1,9 @@
+syntax="proto3";
+
+message Location {
+    string droneId = 1;
+    uint32 seqnum = 2;
+    double latitude = 3;
+    double longitude = 4;
+    double altitude = 5;
+}

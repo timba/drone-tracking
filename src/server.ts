@@ -1,52 +1,11 @@
-import dgram from 'dgram';
-import express from 'express';
-import { create as createHbs } from 'express-handlebars';
-import path from 'path';
-import { AddressInfo } from 'net';
+import { install as installMapSupport } from 'source-map-support';
+import { start as startHttp } from './httpServer';
+import { start as startUdp } from './udpServer';
 
-let drones = new Map<string,string>();
+installMapSupport();
 
-const udpServer = dgram.createSocket('udp4');
-udpServer.on('error', (err) => {
-    console.error(`server error:\n${err.stack}`);
-    udpServer.close();
-  });
-  
-udpServer.on('message', (msg, rinfo) => {
-  console.log(`received ${msg}`)
-  let decoded = msg.toString();
-  let split = decoded.split(',');
-  drones.set(split[0], split[1]);
-});
-  
-udpServer.on('listening', () => {
-  const address = udpServer.address();
-  console.log(`UDP server listening ${address.address}:${address.port}`);
-});
-  
-udpServer.bind(50050);
+let drones = new Map<string, string>();
 
+startUdp(50050, drones);
 
-const httpServer = express();
-
-let hbs = createHbs({
-    defaultLayout: 'index',
-    extname: '.hbs',
-    layoutsDir: path.join(__dirname, '../src/views'),
-});
-
-httpServer.set('view engine', 'hbs');
-httpServer.set('views', path.join(__dirname, '../src/views'));
-httpServer.engine('hbs', hbs.engine);
-
-httpServer.get('/', (request,response) => {
-    console.log(drones.entries());
-    response.render('index', {
-        drones: Array.from(drones.entries())
-    });
-});
-
-let app = httpServer.listen(8080, () => {
-    const address = <AddressInfo>app.address();
-    console.log(`HTTP server listening ${address.address}:${address.port}`);
-});    
+startHttp(8080, drones);
