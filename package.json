@@ -2,10 +2,12 @@
   "name": "drone-tracker",
   "version": "1.0.0",
   "description": "Simple server to track location telemetry from drones",
-  "main": "server.js",
+  "main": "./build/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "start-server": "node ./build/server.js",
+    "start-client": "node ./build/client.js"
   },
   "author": "Timur Babyuk",
   "license": "ISC",

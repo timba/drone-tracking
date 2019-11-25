@@ -32,16 +32,17 @@ const httpServer = express();
 let hbs = createHbs({
     defaultLayout: 'index',
     extname: '.hbs',
-    layoutsDir: path.join(__dirname, './views'),
+    layoutsDir: path.join(__dirname, '../src/views'),
 });
 
 httpServer.set('view engine', 'hbs');
-httpServer.set('views', path.join(__dirname, './views'));
+httpServer.set('views', path.join(__dirname, '../src/views'));
 httpServer.engine('hbs', hbs.engine);
 
 httpServer.get('/', (request,response) => {
+    console.log(drones.entries());
     response.render('index', {
-        drones: drones.entries()
+        drones: Array.from(drones.entries())
     });
 });
 
