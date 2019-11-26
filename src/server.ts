@@ -15,7 +15,7 @@ const bus = new InMemoryBus();
 
 let locationRepository = new InMemoryRepository<DroneLocation>();
 
-let locationReceived = new DroneLocationReceivedHandler(RealNow, locationRepository);
+let locationReceived = new DroneLocationReceivedHandler(RealNow, bus, locationRepository);
 
 bus.subscribe(events.DroneLocationReceived, locationReceived);
 

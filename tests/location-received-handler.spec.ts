@@ -4,7 +4,8 @@ import { DroneLocationReceivedHandler } from "../src/location-received-handler";
 import { InMemoryRepository } from '../src/repository';
 import { DroneLocation } from "../src/types";
 import { MakeFakeNow } from '../src/now';
-
+import { InMemoryBus } from '../src/event-bus';
+import { events } from '../src/events';
 
 describe('DroneLocationReceivedHandler tests', () => {
     const droneId = 'drone_id';
@@ -15,30 +16,31 @@ describe('DroneLocationReceivedHandler tests', () => {
 
     let target: DroneLocationReceivedHandler;
     let locations: InMemoryRepository<DroneLocation>;
+    let bus: InMemoryBus;
 
+    let eventDroneId: string | undefined;
+    let eventOldLocation: DroneLocation | undefined;
+    let eventNewLocation: DroneLocation | undefined;
 
     beforeEach(() => {
+        eventDroneId = undefined;
+        eventOldLocation = undefined;
+        eventNewLocation = undefined;
         locations = new InMemoryRepository<DroneLocation>();
-        target = new DroneLocationReceivedHandler(MakeFakeNow(nowTime), locations);
-    });
-
-    it('when drone absent in storage onEvent should add drone location', () => {
-        let newSeqnum = seqnum + 1;
-        target.onEvent(droneId, newSeqnum, newLocation);
-        let drone = locations.getItem(droneId)!;
-        expect(drone.droneId).equals(droneId);
-        expect(drone.seqnum).equals(newSeqnum);
-        expect(drone.location).equals(newLocation);
-        expect(drone.timeReported).equals(nowTime);
-        expect(drone.timeReported).equals(nowTime);
-    });
-
-    context('when drone exists in storage', () => {
-        beforeEach(() => {
-            locations.setItem(droneId, droneLocation);
+        bus = new InMemoryBus();
+        bus.subscribe(events.DroneLocationChanged, {
+            onEvent(droneId: string, oldLocation: DroneLocation, newLocation: DroneLocation) {
+                eventDroneId = droneId;
+                eventOldLocation = oldLocation;
+                eventNewLocation = newLocation;
+            }
         });
 
-        it('and new seqnum is larger than old seqnum onEvent should change drone location', () => {
+        target = new DroneLocationReceivedHandler(MakeFakeNow(nowTime), bus, locations);
+    });
+
+    context('when drone absent in storage', () => {
+        it('onEvent should add drone location', () => {
             let newSeqnum = seqnum + 1;
             target.onEvent(droneId, newSeqnum, newLocation);
             let drone = locations.getItem(droneId)!;
@@ -48,11 +50,57 @@ describe('DroneLocationReceivedHandler tests', () => {
             expect(drone.timeReported).equals(nowTime);
         });
 
-        it('and new seqnum is smaller than old seqnum onEvent should not change drone location', () => {
+        it(`onEvent should not publish event '${events.DroneLocationChanged}'`, () => {
+            target.onEvent(droneId, seqnum + 1, newLocation);
+            expect(eventDroneId).equals(undefined);
+        });
+    });
+
+    context('when drone exists in storage', () => {
+        beforeEach(() => {
+            locations.setItem(droneId, droneLocation);
+        });
+
+        context('and new seqnum is larger than old seqnum', () => {
+
+            let newSeqnum = seqnum + 1;
+
+            it('onEvent should change drone location', () => {
+                target.onEvent(droneId, newSeqnum, newLocation);
+                let drone = locations.getItem(droneId)!;
+                expect(drone.droneId).equals(droneId);
+                expect(drone.seqnum).equals(newSeqnum);
+                expect(drone.location).equals(newLocation);
+                expect(drone.timeReported).equals(nowTime);
+            });
+
+            it(`onEvent should publish event '${events.DroneLocationChanged}'`, () => {
+                target.onEvent(droneId, newSeqnum, newLocation);
+                expect(eventDroneId).equals(droneId);
+                expect(eventOldLocation).equals(droneLocation);
+                expect(eventNewLocation).to.eql({
+                    droneId,
+                    seqnum: newSeqnum,
+                    location: newLocation,
+                    timeReported: nowTime
+                });
+            });
+        });
+
+        context('and new seqnum is smaller than old seqnum', () => {
+
             let newSeqnum = seqnum - 1;
-            target.onEvent(droneId, newSeqnum, newLocation);
-            let drone = locations.getItem(droneId)!;
-            expect(drone).equals(droneLocation);
+
+            it('onEvent should not change drone location', () => {
+                target.onEvent(droneId, newSeqnum, newLocation);
+                let drone = locations.getItem(droneId)!;
+                expect(drone).equals(droneLocation);
+            });
+
+            it(`onEvent should not publish event '${events.DroneLocationChanged}'`, () => {
+                target.onEvent(droneId, newSeqnum, newLocation);
+                expect(eventDroneId).equals(undefined);
+            });
         });
     });
 });
