@@ -3,6 +3,7 @@ import { start as startHttp } from './httpServer';
 import { start as startUdp } from './udpServer';
 import { DroneLocation } from "./types";
 import { InMemoryRepository } from './repository';
+import { RealNow } from './now';
 import { InMemoryBus } from './event-bus';
 import { events } from './events';
 
@@ -14,7 +15,7 @@ const bus = new InMemoryBus();
 
 let locationRepository = new InMemoryRepository<DroneLocation>();
 
-let locationReceived = new DroneLocationReceivedHandler(locationRepository);
+let locationReceived = new DroneLocationReceivedHandler(RealNow, locationRepository);
 
 bus.subscribe(events.DroneLocationReceived, locationReceived);
 
