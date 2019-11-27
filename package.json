@@ -8,7 +8,7 @@
     "build": "tsc",
     "protoc": "protoc --js_out=import_style=commonjs,binary:. --ts_out=. --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts ./src/loc-message.proto",
     "start-server": "node ./build/server.js",
-    "start-client": "node ./build/client.js"
+    "start-client": "node ./build/client.js localhost 50050 10 1"
   },
   "author": "Timur Babyuk",
   "license": "ISC",
@@ -30,6 +30,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-handlebars": "^3.1.0",
+    "mini.css": "^3.0.1",
     "randomstring": "^1.1.5",
     "source-map-support": "^0.5.16"
   }

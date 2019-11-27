@@ -10,3 +10,8 @@ export type DroneLocation = {
     seqnum: number,
     location: Location,
 }
+
+export type DroneDistance = {
+    distance: number, 
+    timeInterval: number
+}

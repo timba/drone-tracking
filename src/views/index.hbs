@@ -1,28 +1,46 @@
 <html>
+    <head>
+        <link rel="stylesheet" href="/css/mini-default.min.css">
+        <link rel="stylesheet" href="/css/app.css">
+    </head>
     <body>
-        <table>
-            <thead>            
-                <tr>
-                    <th>ID</th>
-                    <th>Time reported</th>
-                    <th>Lat</th>
-                    <th>Lon</th>
-                    <th>Alt</th>
-                    <th>Seqnum</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each drones}}
-                <tr>
-                    <td>{{droneId}}</td>
-                    <td>{{timeReported}}</td>
-                    <td>{{location.latitude}}</td>
-                    <td>{{location.longitude}}</td>
-                    <td>{{location.altitude}}</td>
-                    <td>{{seqnum}}</td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
+        <header class="row">
+            <span class="logo">Drones Management</h1>
+        </header>
+        <div class="row">
+            <main class="col-sm-12">
+                <div class="card fluid">
+                    <h3 class="section">Active Drones ({{drones.length}})</h3>
+                    <div class="section">
+                        <table class="drones">
+                            <thead>            
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Time reported</th>
+                                    <th>Lat</th>
+                                    <th>Lon</th>
+                                    <th>Alt</th>
+                                    <th>Velocity (m/s)</th>
+                                    <th>Moved (m, last 10s)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each drones}}
+                                <tr>
+                                    <td data-label="ID">{{droneId}}</td>
+                                    <td data-label="Time reported">{{timeReported}}</td>
+                                    <td data-label="Lat">{{location.latitude}}</td>
+                                    <td data-label="Lon">{{location.longitude}}</td>
+                                    <td data-label="Alt">{{location.altitude}}</td>
+                                    <td data-label="Velocity (m/s)">{{velocity}}</td>
+                                    <td data-label="Moved (m, last 10s)">{{distanceTraveled}}</td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
     </body>
 </html>

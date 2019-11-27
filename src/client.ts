@@ -2,21 +2,68 @@ import dgram from 'dgram';
 import { Location } from './loc-message_pb';
 import { generate } from 'randomstring';
 
-let client = dgram.createSocket('udp4');
+var args = process.argv.slice(2);
 
-let droneId = generate({
-    length: 8,
-    capitalization: 'lowercase'
-});
+if (args.length < 3) {
+    console.error('Expected 3 or 4 arguments: ip, port, drones count[, send interval (s)]');
+    process.exit(1);
+}
 
-let loc = new Location();
-loc.setDroneid(droneId);
-loc.setSeqnum(1);
-loc.setLatitude(2);
-loc.setLongitude(3);
-loc.setAltitude(4);
+let ip = args[0];
+let port = Number.parseInt(args[1]);
+let dronesCount = Number.parseInt(args[2]);
+// Message send interval. Default: 1s
+const sendInterval = args.length > 3 ? Number.parseFloat(args[3]) : 1;
 
-let encoded = loc.serializeBinary();
-client.send(encoded, 50050, "localhost", (error, _) => {
-    if (error != null) console.error(`Error sending packet from drone `, error);
-});
+console.log(`server: ${ip}:${port}, drones count: ${dronesCount}, send interval: ${sendInterval}`)
+
+const client = dgram.createSocket('udp4');
+
+const initLatitude  = 46.491221;
+const initLongitude = 30.746575;
+const oneMeterLat   = 0.000006953;
+const oneMeterLon   = 0.000008200;
+
+class DroneEmulator {
+    private seqnum = 0;
+    private droneId: string;
+    private shift = 0;
+
+    constructor(private interval: number, private moveLat: number, private moveLon: number) {
+        this.droneId = generate({
+            length: 8,
+            capitalization: 'lowercase'
+        });
+    }
+
+    send() {
+        let loc = new Location();
+        loc.setDroneid(this.droneId);
+        loc.setSeqnum(this.seqnum);
+        loc.setLatitude(initLatitude + this.moveLat * this.shift);
+        loc.setLongitude(initLongitude + this.moveLon * this.shift);
+        loc.setAltitude(124);
+
+        let encoded = loc.serializeBinary();
+        client.send(encoded, port, ip, (error, _) => {
+            if (error != null) console.error(`Error sending packet from drone `, error);
+        });
+
+
+        this.seqnum++;
+        this.shift++;
+
+        setTimeout(() => this.send(),
+            this.interval * 1000);
+    }
+}
+
+for (let i = 0; i < dronesCount; i++) {
+    let startDelay = Math.random() * 1000;
+    setTimeout(() => {
+        new DroneEmulator(
+            sendInterval,
+            oneMeterLat * Math.random() * 10,
+            oneMeterLon * Math.random() * 10).send()
+    }, startDelay);
+}

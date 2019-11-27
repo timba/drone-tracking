@@ -2,10 +2,9 @@ import express from 'express';
 import { create as createHbs } from 'express-handlebars';
 import path from 'path';
 import { AddressInfo } from 'net';
-import { IRepository } from './repository';
-import { DroneLocation } from './types';
+import { DronesViewBuilder } from './drone-view';
 
-export function start(port: number, drones: IRepository<DroneLocation>) {
+export function start(port: number, dronesViewBuilder: DronesViewBuilder) {
     const httpServer = express();
 
     let hbs = createHbs({
@@ -23,7 +22,7 @@ export function start(port: number, drones: IRepository<DroneLocation>) {
         let items = Array.from([]);
         
         response.render('index', {
-            drones: Array.from(drones.getItems())
+            drones: dronesViewBuilder.getDronesView()
         });
     });
 
