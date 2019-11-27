@@ -1,11 +1,11 @@
 import 'mocha';
 import { expect } from 'chai';
-import { DroneLocationReceivedHandler } from "../src/location-received-handler";
-import { InMemoryRepository } from '../src/repository';
-import { DroneLocation } from "../src/types";
-import { MakeFakeNow } from '../src/now';
-import { InMemoryBus } from '../src/event-bus';
-import { events } from '../src/events';
+import { DroneLocationReceivedHandler } from "../../src/event-handlers/location-received";
+import { InMemoryRepository } from '../../src/repository';
+import { DroneLocation } from "../../src/types";
+import { MakeFakeNow } from '../../src/now';
+import { InMemoryBus } from '../../src/event-bus';
+import { events } from '../../src/events';
 
 describe('DroneLocationReceivedHandler tests', () => {
     const droneId = 'drone_id';

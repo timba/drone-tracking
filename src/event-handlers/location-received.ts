@@ -1,8 +1,8 @@
-import { Location, DroneLocation } from "./types";
-import { Now } from "./now";
-import { IRepository } from './repository';
-import { IBus } from './event-bus';
-import { events } from './events';
+import { Location, DroneLocation } from "../types";
+import { Now } from "../now";
+import { IRepository } from '../repository';
+import { IBus } from '../event-bus';
+import { events } from '../events';
 
 export class DroneLocationReceivedHandler {
     constructor(private now: Now, private bus: IBus, private droneLocationRepository: IRepository<DroneLocation>) {
