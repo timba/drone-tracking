@@ -14,9 +14,12 @@ import { DroneLocationChangedHandler } from "./event-handlers/location-changed";
 import { DroneDistanceMeasuredHandler } from "./event-handlers/distance-measured";
 import { DroneVelocityMeasuredHandler } from "./event-handlers/velocity-measured";
 import { DronePacketsStatHandler } from './event-handlers/packets-stat';
+import { DronesFlushCheckEventHandler } from './event-handlers/flush-check';
+import { DroneFlushEventHandler } from './event-handlers/flush';
 
 const distanceStorageDepth = 20;
 const timeDistanceLimit = 10;
+const droneLifetime = 30;
 
 const bus = new InMemoryBus();
 
@@ -30,12 +33,16 @@ let locationChanged  = new DroneLocationChangedHandler(bus);
 let distanceMeasured = new DroneDistanceMeasuredHandler(distanceStorageDepth, distanceRepository);
 let velocityMeasured = new DroneVelocityMeasuredHandler(velocityRepository);
 let packetsStat      = new DronePacketsStatHandler(packetsRepository);
+let dronesFlushCheck = new DronesFlushCheckEventHandler(locationRepository, RealNow, droneLifetime, bus);
+let droneFlush       = new DroneFlushEventHandler(locationRepository, velocityRepository, distanceRepository);
 
 bus.subscribe(events.DroneLocationReceived, locationReceived);
 bus.subscribe(events.DroneLocationChanged , locationChanged);
 bus.subscribe(events.DroneLocationChanged , packetsStat);
 bus.subscribe(events.DroneDistanceMeasured, distanceMeasured);
 bus.subscribe(events.DroneVelocityMeasured, velocityMeasured);
+bus.subscribe(events.DroneFlushCheck      , dronesFlushCheck);
+bus.subscribe(events.DroneFlush           , droneFlush);
 
 import { DronesViewBuilder } from './drone-view';
 
@@ -46,4 +53,8 @@ import { start as startHttp } from './httpServer';
 import { start as startUdp } from './udpServer';
 
 startUdp(50050, bus);
-startHttp(8080, dronesViewBuilder);    
+startHttp(8080, dronesViewBuilder);
+
+import { startDronesFlushTimer } from './flush-drones-timer';
+
+startDronesFlushTimer(droneLifetime, bus);

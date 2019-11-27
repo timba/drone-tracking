@@ -3,4 +3,6 @@ export enum events {
     DroneLocationChanged  = "drone-location-changed",
     DroneDistanceMeasured = "drone-distance-measured",
     DroneVelocityMeasured = "drone-velocity-measured",
+    DroneFlushCheck       = "drone-flush-check",
+    DroneFlush            = "drone-flush"
 }
