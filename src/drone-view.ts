@@ -9,8 +9,11 @@ export type DroneView = {
     droneId: string,
     location: Location,
     timeReported: string,
+    sinceLastReported: number,
     distanceTraveled: number,
     velocity: number,
+    isStopped: boolean,
+    noMessage: boolean,
 }
 
 export class DronesViewBuilder {
@@ -47,12 +50,18 @@ export class DronesViewBuilder {
                 intervalSum += element.timeInterval;
             }
 
+            let hasStopped = sinceLastReported < this.timeDistanceLimit && travelDistance < 1;
+            let noMessage = sinceLastReported >= 10;
+
             return {
                 droneId: drone.droneId,
                 location: drone.location,
                 timeReported: drone.timeReported.toLocaleString(),
+                sinceLastReported: Math.round(sinceLastReported),
                 distanceTraveled: Math.round(travelDistance),
                 velocity: Math.round(velocity),
+                isStopped: hasStopped,
+                noMessage: noMessage,
             }
         });
     }

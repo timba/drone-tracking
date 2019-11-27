@@ -28,6 +28,7 @@ class DroneEmulator {
     private seqnum = 0;
     private droneId: string;
     private shift = 0;
+    private stopped = false;
 
     constructor(private interval: number, private moveLat: number, private moveLon: number) {
         this.droneId = generate({
@@ -40,8 +41,8 @@ class DroneEmulator {
         let loc = new Location();
         loc.setDroneid(this.droneId);
         loc.setSeqnum(this.seqnum);
-        loc.setLatitude(initLatitude + this.moveLat * this.shift);
-        loc.setLongitude(initLongitude + this.moveLon * this.shift);
+        loc.setLatitude(initLatitude + this.moveLat * this.shift * (this.stopped ? 1 : Math.random()));
+        loc.setLongitude(initLongitude + this.moveLon * this.shift * (this.stopped ? 1 : Math.random()));
         loc.setAltitude(124);
 
         let encoded = loc.serializeBinary();
@@ -49,12 +50,21 @@ class DroneEmulator {
             if (error != null) console.error(`Error sending packet from drone `, error);
         });
 
+        // Emulate drone stopped sometimes for 20 sec
+        if (this.stopped == false && Math.random() < 0.03) {
+            this.stopped = true;
+            setTimeout(() => this.stopped = false, 20000);
+        }
 
         this.seqnum++;
-        this.shift++;
+
+        if (this.stopped == false) {
+            this.shift++;
+        }
 
         setTimeout(() => this.send(),
-            this.interval * 1000);
+            // Emulate telemetry lost sometimes for 20 seconds
+            (!this.stopped && Math.random() < 0.02) ? 20000 : this.interval * 1000);
     }
 }
 

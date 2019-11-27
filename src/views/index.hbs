@@ -28,12 +28,22 @@
                                 {{#each drones}}
                                 <tr>
                                     <td data-label="ID">{{droneId}}</td>
-                                    <td data-label="Time reported">{{timeReported}}</td>
+                                    <td data-label="Time reported">
+                                        {{timeReported}}
+                                        {{#if noMessage}}
+                                            <mark class="secondary">No telemetry since {{sinceLastReported}}s ago</mark>
+                                        {{/if}}
+                                    </td>
                                     <td data-label="Lat">{{location.latitude}}</td>
                                     <td data-label="Lon">{{location.longitude}}</td>
                                     <td data-label="Alt">{{location.altitude}}</td>
                                     <td data-label="Velocity (m/s)">{{velocity}}</td>
-                                    <td data-label="Moved (m, last 10s)">{{distanceTraveled}}</td>
+                                    <td data-label="Moved (m, last 10s)">
+                                        {{distanceTraveled}}
+                                        {{#if isStopped}}
+                                            <mark class="secondary" >Stopped</mark>
+                                        {{/if}}
+                                    </td>
                                 </tr>
                                 {{/each}}
                             </tbody>
