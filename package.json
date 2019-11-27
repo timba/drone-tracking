@@ -12,6 +12,7 @@
   },
   "author": "Timur Babyuk",
   "license": "ISC",
+  "repository": ".",
   "devDependencies": {
     "@types/chai": "^4.2.5",
     "@types/express": "^4.17.2",
