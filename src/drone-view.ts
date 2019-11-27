@@ -1,4 +1,4 @@
-import { Location, DroneDistance } from "./types";
+import { Location, DroneDistance, DronePackets } from "./types";
 import { IRepository } from "./repository";
 import { DroneLocation } from "./types";
 import { Now } from "./now";
@@ -14,6 +14,8 @@ export type DroneView = {
     velocity: number,
     isStopped: boolean,
     noMessage: boolean,
+    missed: number,
+    received: number,
 }
 
 export class DronesViewBuilder {
@@ -23,7 +25,8 @@ export class DronesViewBuilder {
         private now: Now,
         private droneLocations: IRepository<DroneLocation>,
         private droneDistances: IRepository<IList<DroneDistance>>,
-        private droneVelocities: IRepository<number>) { }
+        private droneVelocities: IRepository<number>,
+        private dronePackets: IRepository<DronePackets>) { }
 
     getDronesView(): DroneView[] {
         let drones = Array.from(this.droneLocations.getItems());
@@ -35,6 +38,9 @@ export class DronesViewBuilder {
             if (distancesList != undefined) {
                 distances = distancesList.items();
             }
+
+            let packets = this.dronePackets.getItem(drone.droneId) 
+                || { received: 0, missed: 0 };
 
             let sinceLastReported = getTimeInterval(now, drone.timeReported);
             let intervalSum = sinceLastReported;
@@ -62,6 +68,8 @@ export class DronesViewBuilder {
                 velocity: Math.round(velocity),
                 isStopped: hasStopped,
                 noMessage: noMessage,
+                missed: packets.missed,
+                received: packets.received,
             }
         });
     }

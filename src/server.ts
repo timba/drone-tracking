@@ -2,7 +2,7 @@ import { install as installMapSupport } from 'source-map-support';
 
 installMapSupport();
 
-import { DroneLocation, DroneDistance } from "./types";
+import { DroneLocation, DroneDistance, DronePackets } from "./types";
 import { IList } from './list';
 import { InMemoryRepository } from './repository';
 import { RealNow } from './now';
@@ -13,6 +13,7 @@ import { DroneLocationReceivedHandler } from './event-handlers/location-received
 import { DroneLocationChangedHandler } from "./event-handlers/location-changed";
 import { DroneDistanceMeasuredHandler } from "./event-handlers/distance-measured";
 import { DroneVelocityMeasuredHandler } from "./event-handlers/velocity-measured";
+import { DronePacketsStatHandler } from './event-handlers/packets-stat';
 
 const distanceStorageDepth = 20;
 const timeDistanceLimit = 10;
@@ -22,21 +23,24 @@ const bus = new InMemoryBus();
 let locationRepository = new InMemoryRepository<DroneLocation>();
 let distanceRepository = new InMemoryRepository<IList<DroneDistance>>();
 let velocityRepository = new InMemoryRepository<number>();
+let packetsRepository  = new InMemoryRepository<DronePackets>();
 
 let locationReceived = new DroneLocationReceivedHandler(RealNow, bus, locationRepository);
 let locationChanged  = new DroneLocationChangedHandler(bus);
 let distanceMeasured = new DroneDistanceMeasuredHandler(distanceStorageDepth, distanceRepository);
 let velocityMeasured = new DroneVelocityMeasuredHandler(velocityRepository);
+let packetsStat      = new DronePacketsStatHandler(packetsRepository);
 
 bus.subscribe(events.DroneLocationReceived, locationReceived);
 bus.subscribe(events.DroneLocationChanged , locationChanged);
+bus.subscribe(events.DroneLocationChanged , packetsStat);
 bus.subscribe(events.DroneDistanceMeasured, distanceMeasured);
 bus.subscribe(events.DroneVelocityMeasured, velocityMeasured);
 
 import { DronesViewBuilder } from './drone-view';
 
 let dronesViewBuilder = new DronesViewBuilder(timeDistanceLimit, RealNow, 
-    locationRepository, distanceRepository, velocityRepository);  
+    locationRepository, distanceRepository, velocityRepository, packetsRepository);  
     
 import { start as startHttp } from './httpServer';
 import { start as startUdp } from './udpServer';

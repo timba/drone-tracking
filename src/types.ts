@@ -15,3 +15,8 @@ export type DroneDistance = {
     distance: number, 
     timeInterval: number
 }
+
+export type DronePackets = {
+    received: number,
+    missed: number,    
+}

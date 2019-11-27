@@ -22,6 +22,7 @@
                                     <th>Alt</th>
                                     <th>Velocity (m/s)</th>
                                     <th>Moved (m, last 10s)</th>
+                                    <th>Received / Missed</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,6 +45,7 @@
                                             <mark class="secondary" >Stopped</mark>
                                         {{/if}}
                                     </td>
+                                    <td data-label="Received / Missed">{{received}} / {{missed}}</td>
                                 </tr>
                                 {{/each}}
                             </tbody>
