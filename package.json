@@ -7,7 +7,7 @@
     "test": "mocha -r ts-node/register './tests/**/*.spec.ts'",
     "build": "tsc",
     "protoc": "protoc --js_out=import_style=commonjs,binary:. --ts_out=. --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts ./src/loc-message.proto",
-    "start-server": "node ./build/server.js",
+    "start-server": "node ./build/server.js 50050 8080",
     "start-client": "node ./build/client.js localhost 50050 10 1"
   },
   "author": "Timur Babyuk",

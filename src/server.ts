@@ -17,6 +17,16 @@ import { DronePacketsStatHandler } from './event-handlers/packets-stat';
 import { DronesFlushCheckEventHandler } from './event-handlers/flush-check';
 import { DroneFlushEventHandler } from './event-handlers/flush';
 
+var args = process.argv.slice(2);
+
+if (args.length < 2) {
+    console.error('Expected 2 arguments: UDP port, HTTP port');
+    process.exit(1);
+}
+
+const udpPort = Number.parseInt(args[0]);
+const httpPort = Number.parseInt(args[1]);
+
 const distanceStorageDepth = 20;
 const timeDistanceLimit = 10;
 const droneLifetime = 30;
@@ -52,8 +62,8 @@ let dronesViewBuilder = new DronesViewBuilder(timeDistanceLimit, RealNow,
 import { start as startHttp } from './httpServer';
 import { start as startUdp } from './udpServer';
 
-startUdp(50050, bus);
-startHttp(8080, dronesViewBuilder);
+startUdp(udpPort, bus);
+startHttp(httpPort, dronesViewBuilder);
 
 import { startDronesFlushTimer } from './flush-drones-timer';
 
