@@ -10,13 +10,13 @@ export function start(port: number, dronesViewBuilder: DronesViewBuilder) {
     let hbs = createHbs({
         defaultLayout: 'index',
         extname: '.hbs',
-        layoutsDir: path.join(__dirname, '../src/views'),
+        layoutsDir: path.join(__dirname, 'views'),
     });
 
     httpServer.set('view engine', 'hbs');
-    httpServer.set('views', path.join(__dirname, '../src/views'));
+    httpServer.set('views', path.join(__dirname, 'views'));
     httpServer.engine('hbs', hbs.engine);
-    httpServer.use(express.static('src/assets'));
+    httpServer.use(express.static(path.join(__dirname, 'assets')));
 
     httpServer.get('/', (request,response) => {
         let items = Array.from([]);
